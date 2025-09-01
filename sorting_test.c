@@ -66,6 +66,8 @@ int main(int argc, char **argv)
 	if (argc > 1)
 		sscanf(argv[1], "%lu", &num_tests);
 
+	printf("Sorting %lu random integers\n", num_tests);
+
 	int *test_arr = malloc(num_tests * sizeof(*test_arr));
 	for (int i = 0; i < num_tests; i++)
 		test_arr[i] = i;

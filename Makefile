@@ -1,6 +1,6 @@
 CFLAGS=-O3
 
-ALL=test sort
+ALL=benchmark sorting_test
 
 all: $(ALL)
 

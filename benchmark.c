@@ -84,6 +84,8 @@ int main(int argc, char **argv)
 
 	struct splay_link *root = NULL;
 
+	printf("Inserting %lu random string/integer pairs\n", num_tests);
+
 	// Measure time to insert nodes
 	clock_t insert_time = clock();
 	for (int i = 0; i < num_tests; i++) {
