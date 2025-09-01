@@ -23,10 +23,10 @@ enum splay_dir record_nav(const struct splay_link *link, const struct splay_link
 
 	int cmp = strcmp(rec2->key, rec1->key);
 	if (cmp < 0)
-		return LEFT;
+		return SPLAY_LEFT;
 	else if (cmp > 0)
-		return RIGHT;
-	return HERE;
+		return SPLAY_RIGHT;
+	return SPLAY_HERE;
 }
 
 
@@ -64,11 +64,11 @@ void print_records(struct splay_link *root)
 {
 	struct record *rec = SPLAY_CONTAINER(root, struct record, link);
 
-	if (rec->link.child[LEFT])
-		print_records(rec->link.child[LEFT]);
+	if (rec->link.child[SPLAY_LEFT])
+		print_records(rec->link.child[SPLAY_LEFT]);
 	printf("%s: %d\n", rec->key, rec->val);
-	if (rec->link.child[RIGHT])
-		print_records(rec->link.child[RIGHT]);
+	if (rec->link.child[SPLAY_RIGHT])
+		print_records(rec->link.child[SPLAY_RIGHT]);
 }
 
 int main(int argc, char **argv)

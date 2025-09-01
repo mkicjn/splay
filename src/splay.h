@@ -10,11 +10,10 @@ struct splay_link {
 
 enum splay_dir {
 	// (used for child indexing)
-	LEFT  = 0,
-	RIGHT = 1,
+	SPLAY_LEFT  = 0,
+	SPLAY_RIGHT = 1,
 	// (not used for child indexing)
-	HERE,
-	NOWHERE,
+	SPLAY_HERE,
 };
 
 typedef enum splay_dir (*splay_nav_fn)(const struct splay_link *here, const struct splay_link *nav_arg);

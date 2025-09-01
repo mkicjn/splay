@@ -14,21 +14,21 @@ enum splay_dir record_nav(const struct splay_link *here, const struct splay_link
 	struct record *b = SPLAY_CONTAINER(arg, struct record, link);
 
 	if (b->num < a->num)
-		return LEFT;
+		return SPLAY_LEFT;
 	else if (b->num > a->num)
-		return RIGHT;
-	return HERE;
+		return SPLAY_RIGHT;
+	return SPLAY_HERE;
 }
 
 void save_records(struct splay_link *root, int *arr, size_t *len)
 {
 	struct record *rec = SPLAY_CONTAINER(root, struct record, link);
 
-	if (rec->link.child[LEFT])
-		save_records(rec->link.child[LEFT], arr, len);
+	if (rec->link.child[SPLAY_LEFT])
+		save_records(rec->link.child[SPLAY_LEFT], arr, len);
 	arr[(*len)++] = rec->num;
-	if (rec->link.child[RIGHT])
-		save_records(rec->link.child[RIGHT], arr, len);
+	if (rec->link.child[SPLAY_RIGHT])
+		save_records(rec->link.child[SPLAY_RIGHT], arr, len);
 }
 
 void splaysort(int *arr, size_t len)

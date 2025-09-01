@@ -2,7 +2,7 @@
 
 /*
  * Move x where p was and swap links around
- * e.g., rotate(&g->child[LEFT], RIGHT);
+ * e.g., rotate(&g->child[SPLAY_LEFT], SPLAY_RIGHT);
  *
  *      (g)           (g)
  *      / \           / \
@@ -35,7 +35,7 @@ bool splay_find(struct splay_link **root_ptr, splay_nav_fn nav, const struct spl
 	for (;;) {
 		struct splay_link *g = *root_ptr;
 		enum splay_dir dir = nav(g, nav_arg);
-		if (dir == HERE)
+		if (dir == SPLAY_HERE)
 			break;
 
 		struct splay_link *p = g->child[dir];
@@ -55,11 +55,11 @@ bool splay_find(struct splay_link **root_ptr, splay_nav_fn nav, const struct spl
 	}
 
 	struct splay_link *g = *root_ptr;
-	*leaf[LEFT] = g->child[LEFT];
-	*leaf[RIGHT] = g->child[RIGHT];
-	g->child[LEFT] = subtree[LEFT];
-	g->child[RIGHT] = subtree[RIGHT];
-	return nav(g, nav_arg) == HERE;
+	*leaf[SPLAY_LEFT] = g->child[SPLAY_LEFT];
+	*leaf[SPLAY_RIGHT] = g->child[SPLAY_RIGHT];
+	g->child[SPLAY_LEFT] = subtree[SPLAY_LEFT];
+	g->child[SPLAY_RIGHT] = subtree[SPLAY_RIGHT];
+	return nav(g, nav_arg) == SPLAY_HERE;
 }
 
 bool splay_insert(struct splay_link **root_ptr, splay_nav_fn nav, struct splay_link *x)
@@ -84,10 +84,10 @@ bool splay_insert(struct splay_link **root_ptr, splay_nav_fn nav, struct splay_l
 static enum splay_dir splay_nav_to_min(const struct splay_link *n, const struct splay_link *unused)
 {
 	(void)unused;
-	if (n->child[LEFT] == NULL)
-		return HERE;
+	if (n->child[SPLAY_LEFT] == NULL)
+		return SPLAY_HERE;
 	else
-		return LEFT;
+		return SPLAY_LEFT;
 }
 
 bool splay_delete(struct splay_link **root_ptr, splay_nav_fn nav, const struct splay_link *nav_arg)
@@ -96,15 +96,15 @@ bool splay_delete(struct splay_link **root_ptr, splay_nav_fn nav, const struct s
 		return false;
 	struct splay_link *del = *root_ptr;
 
-	if (!del->child[RIGHT]) {
-		*root_ptr = del->child[LEFT];
+	if (!del->child[SPLAY_RIGHT]) {
+		*root_ptr = del->child[SPLAY_LEFT];
 		return true;
-	} else if (!del->child[LEFT]) {
-		*root_ptr = del->child[RIGHT];
+	} else if (!del->child[SPLAY_LEFT]) {
+		*root_ptr = del->child[SPLAY_RIGHT];
 		return true;
 	}
-	*root_ptr = del->child[RIGHT];
+	*root_ptr = del->child[SPLAY_RIGHT];
 	splay_find(root_ptr, splay_nav_to_min, NULL);
-	(*root_ptr)->child[LEFT] = del->child[LEFT];
+	(*root_ptr)->child[SPLAY_LEFT] = del->child[SPLAY_LEFT];
 	return true;
 }

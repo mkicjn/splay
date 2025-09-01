@@ -8,7 +8,7 @@ There are two steps to use this library:
 
 1. Define your own node struct with a `struct splay_link` member inside it.
 2. Define a "navigation" function (essentially a comparator) for your struct.
-   * This function takes two pointers to `struct splay_link` and returns `LEFT`, `RIGHT`, or `HERE` depending on how they compare.
+   * This function takes two pointers to `struct splay_link` and returns `SPLAY_LEFT`, `SPLAY_RIGHT`, or `SPLAY_HERE` depending on how they compare.
    * You can retrieve a pointer to your outer struct with `SPLAY_CONTAINER`, which is essentially a definition of `container_of` provided for you.
 
 Afterwards, you can declare a `struct splay_link *root = NULL;` and call `splay_insert()`, `splay_find()`, and `splay_delete()` to manipulate the tree.
