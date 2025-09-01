@@ -16,11 +16,13 @@ Afterwards, you can declare a `struct splay_link *root = NULL;` and call `splay_
 
 Functions signatures can be found in `src/splay.h`.
 **Note that these functions take pointers to the `struct splay_link` member of your struct** and rely on your nav function to work properly.
+This might seem a little awkward, but lends itself to making the API ultra-consistent (all three functions have the exact same signature, except for a single `const` qualifier missing in `splay_insert()`).
 
 For working with keys directly, it may be useful to define some shims that instantiate your struct on the stack with whatever it needs to be comparable.
 This isn't something the library can do for you, since it doesn't know what you plan to put in your structs (or how you plan to compare them).
-Alternatively, you can pass in a pointer to something else as your argument and use a separate nav function.
-A previous version of the API had `const void *` arguments instead to foreshadow this use case, but this usage felt more complicated with no obvious benefit in practice.
+Alternatively, you can pass in a pointer to something else as your argument and use a separate nav function that knows what to do with it.
+A previous version of the API had `const void *` arguments instead to foreshadow this use case, but this inconsistency felt undesirable and lacked a clear practical benefit.
+(There's some awkward instantiation/pointer-passing/casting nonsense going on either way, so might as well be consistent about it; regardless, it's trivial to switch back.)
 
 
 ## Example
