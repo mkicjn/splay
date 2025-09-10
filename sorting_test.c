@@ -36,7 +36,7 @@ void splaysort(int *arr, size_t len)
 	struct record *nodes = malloc(len * sizeof(*nodes));
 	struct splay_link *root = NULL;
 
-	for (int i = 0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		struct record *rec = &nodes[i];
 		rec->num = arr[i];
 		splay_insert(&root, record_nav, &rec->link);
@@ -50,7 +50,7 @@ void splaysort(int *arr, size_t len)
 
 void shuffle(int *arr, size_t len)
 {
-	for (int i = 0; i < len; i++) {
+	for (size_t i = 0; i < len - 2; i++) {
 		int j = i + (rand() % (len - i));
 		int temp = arr[i];
 		arr[i] = arr[j];
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 	printf("Sorting %lu random integers\n", num_tests);
 
 	int *test_arr = malloc(num_tests * sizeof(*test_arr));
-	for (int i = 0; i < num_tests; i++)
+	for (size_t i = 0; i < num_tests; i++)
 		test_arr[i] = i;
 	shuffle(test_arr, num_tests);
 
@@ -78,10 +78,10 @@ int main(int argc, char **argv)
 	sort_time = clock() - sort_time;
 	printf("Splaysort: %fms\n", (sort_time / (double)CLOCKS_PER_SEC * 1000.0));
 
-	for (int i = 0; i < num_tests - 1; i++) {
+	for (size_t i = 0; i < num_tests - 1; i++) {
 		if (test_arr[i+1] < test_arr[i]) {
 			printf("Sanity check failed\n");
-			for (int j = 0; j < num_tests - 1; j++)
+			for (size_t j = 0; j < num_tests - 1; j++)
 				printf("%d\n", test_arr[j]);
 			break;
 		}

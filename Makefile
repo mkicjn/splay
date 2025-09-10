@@ -1,4 +1,4 @@
-CFLAGS=-O3
+CFLAGS=-O3 -Wall -Wextra -pedantic
 
 ALL=benchmark sorting_test
 

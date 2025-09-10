@@ -35,10 +35,10 @@ enum splay_dir record_nav(const struct splay_link *link, const struct splay_link
 void rand_string(char key[KEYLEN])
 {
 #define MINLEN 20
-	int len = MINLEN + (rand() % (KEYLEN-1-MINLEN));
+	size_t len = MINLEN + (rand() % (KEYLEN-1-MINLEN));
 #define CONSONANTS "bcdfghjklmnpqrstvwxyz"
 #define VOWELS "aeiou"
-	for (int i = 0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		char c;
 		if (i % 2 == 0) {
 			c = CONSONANTS[rand() % (sizeof(CONSONANTS)-1)];
@@ -52,7 +52,7 @@ void rand_string(char key[KEYLEN])
 
 void shuffle(int *arr, size_t len)
 {
-	for (int i = 0; i < len; i++) {
+	for (size_t i = 0; i < len - 2; i++) {
 		int j = i + (rand() % (len - i));
 		int temp = arr[i];
 		arr[i] = arr[j];
@@ -84,15 +84,19 @@ int main(int argc, char **argv)
 
 	struct splay_link *root = NULL;
 
-	printf("Inserting %lu random string/integer pairs\n", num_tests);
+	printf("Initializing node pool with random bytes...\n");
+	for (size_t i = 0; i < num_tests * sizeof(*test_nodes); i++)
+		((char *)test_nodes)[i] = rand() % 0xff;
+
+	printf("Generating and inserting %lu random string/integer pairs\n", num_tests);
 
 	// Measure time to insert nodes
 	clock_t insert_time = clock();
-	for (int i = 0; i < num_tests; i++) {
+	for (size_t i = 0; i < num_tests; i++) {
 		struct record *rec = &test_nodes[next_rec++];
 		rand_string(rec->key);
 		rec->val = rand();
-		if (!splay_insert(&root, record_nav, &rec->link)) {
+		if (splay_insert(&root, record_nav, &rec->link) != NULL) {
 			printf("Insertion failed (duplicate)\n");
 			printf("Word was: %s\n", rec->key);
 		}
@@ -100,30 +104,30 @@ int main(int argc, char **argv)
 	insert_time = clock() - insert_time;
 	if (argc > 2)
 		print_records(root);
-	printf("Average insertion time %fms\n", (insert_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
+	printf("Average generation + insertion time: %fms\n", (insert_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
 
 	// Generate a shuffled array of indices for testing randomized lookup time
 	int *rand_indices = malloc(num_tests * sizeof(*rand_indices));
-	for (int i = 0; i < num_tests; i++)
+	for (size_t i = 0; i < num_tests; i++)
 		rand_indices[i] = i;
 	shuffle(rand_indices, num_tests);
 
 	// Measure the time to do lookups in that randomized order
 	clock_t find_time = clock();
-	for (int i = 0; i < num_tests; i++) {
+	for (size_t i = 0; i < num_tests; i++) {
 		struct record *rec = &test_nodes[rand_indices[i]];
 		if (!splay_find(&root, record_nav, &rec->link))
 			printf("Find failed\n");
 	}
 	find_time = clock() - find_time;
-	printf("Average find time %fms\n", (find_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
+	printf("Average find time (random order): %fms\n", (find_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
 
 	// Shuffle the index array again
 	shuffle(rand_indices, num_tests);
 
 	// Measure the time to delete each item in that order
 	clock_t delete_time = clock();
-	for (int i = 0; i < num_tests; i++) {
+	for (size_t i = 0; i < num_tests; i++) {
 		struct record *rec = &test_nodes[rand_indices[i]];
 		if (!splay_delete(&root, record_nav, &rec->link)) {
 			printf("Deletion failed\n");
@@ -131,7 +135,7 @@ int main(int argc, char **argv)
 		}
 	}
 	delete_time = clock() - delete_time;
-	printf("Average delete time %fms\n", (delete_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
+	printf("Average delete time (random order): %fms\n", (delete_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
 
 	free(rand_indices);
 	free(test_nodes);
