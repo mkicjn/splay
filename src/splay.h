@@ -47,7 +47,7 @@ enum splay_dir {
 
 typedef enum splay_dir (*splay_nav_fn)(const struct splay_link *here, const struct splay_link *arg);
 
-// To retrieve a pointer to a user struct using a pointer to its link member, use the below macro
+// To retrieve a pointer to a user struct based on a pointer to its link member, invoke the below macro
 //
 // Parameters:
 // - PTR: A pointer to the link member inside a user struct
