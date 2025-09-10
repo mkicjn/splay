@@ -38,45 +38,54 @@ A previous version of the API had `const void *` arguments instead to foreshadow
     #include <string.h>
     
     struct record {
+        // Demonstration: User struct containing arbitrary values
         char *key;
         int val;
         struct splay_link link;
     };
     
-    enum splay_dir record_nav(const struct splay_link *link, const struct splay_link *arg)
+    enum splay_dir record_nav(const struct splay_link *here, const struct splay_link *arg)
     {
-        struct record *rec1 = SPLAY_CONTAINER(link, struct record, link);
+        // Demonstration: User navigation function serving as a comparator
+        struct record *rec1 = SPLAY_CONTAINER(here, struct record, link);
         struct record *rec2 = SPLAY_CONTAINER(arg, struct record, link);
     
         int cmp = strcmp(rec2->key, rec1->key);
         if (cmp < 0)
-            return SPLAY_LEFT;
+            return SPLAY_LEFT; // arg < here, go left
         else if (cmp > 0)
-            return SPLAY_RIGHT;
-        return SPLAY_HERE;
+            return SPLAY_RIGHT; // arg > here, go right
+        else
+            return SPLAY_HERE; // arg == here, done
     }
     
     int record_get(struct splay_link **root, char *key)
     {
+        // Demonstration: Instantiating a dummy struct to search for a matching entry in the tree
         struct record query = {.key = key};
-    
-        struct splay_link *match = splay_find(root, record_nav, &query.link);
+        struct splay_link *match = splay_find(root, record_nav, &query.link); // Note use of &query.link
         if (match == NULL)
             return -1;
     
+        // Demonstration: Extracting values from a search result
         struct record *result = SPLAY_CONTAINER(match, struct record, link);
         return result->val;
     }
     
     void print_all_records(struct splay_link *root)
     {
+        // Demonstration: Tree traversal using link members
         if (root == NULL)
             return;
+        struct record *here = SPLAY_CONTAINER(root, struct record, link);
     
-        struct record *rec = SPLAY_CONTAINER(root, struct record, link);
-    
-        print_all_records(rec->link.child[SPLAY_LEFT]);
-        printf("%s: %d\n", rec->key, rec->val);
-        print_all_records(rec->link.child[SPLAY_RIGHT]);
+        // Traverse left subtree
+        print_all_records(here->link.child[SPLAY_LEFT]);
+
+        // Visit node
+        printf("%s: %d\n", here->key, here->val);
+
+        // Traverse right subtree
+        print_all_records(here->link.child[SPLAY_RIGHT]);
     }
 ```
