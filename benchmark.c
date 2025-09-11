@@ -3,7 +3,6 @@
 #include <string.h>
 #include <time.h>
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "src/splay.h"
@@ -16,19 +15,18 @@ struct record {
 	struct splay_link link;
 };
 
-enum splay_dir record_nav(const struct splay_link *link, const struct splay_link *arg)
+enum splay_dir record_nav(const struct splay_link *arg, const struct splay_link *tree_node)
 {
-	struct record *rec1 = SPLAY_CONTAINER(link, struct record, link);
-	struct record *rec2 = SPLAY_CONTAINER(arg, struct record, link);
+	struct record *a = SPLAY_CONTAINER(arg, struct record, link);
+	struct record *b = SPLAY_CONTAINER(tree_node, struct record, link);
 
-	int cmp = strcmp(rec2->key, rec1->key);
-	if (cmp < 0)
-		return SPLAY_LEFT;
-	else if (cmp > 0)
+	int cmp = strcmp(b->key, a->key);
+	if (cmp > 0)
 		return SPLAY_RIGHT;
+	else if (cmp < 0)
+		return SPLAY_LEFT;
 	return SPLAY_HERE;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 

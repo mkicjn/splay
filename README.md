@@ -59,11 +59,12 @@ A previous version of the API had `const void *` arguments instead to foreshadow
             return SPLAY_HERE; // arg == here, done
     }
     
-    int record_get(struct splay_link **root, char *key)
+    int record_get(struct splay_link **root_ptr, char *key)
     {
         // Demonstration: Instantiating a dummy struct to search for a matching entry in the tree
         struct record query = {.key = key};
-        struct splay_link *match = splay_find(root, record_nav, &query.link); // Note use of &query.link
+        struct splay_link *match = splay_find(root_ptr, record_nav, &query.link);
+        // ^ Note use of `&query.link` instead of `query` or `&query`
         if (match == NULL)
             return -1;
     
@@ -77,15 +78,15 @@ A previous version of the API had `const void *` arguments instead to foreshadow
         // Demonstration: Tree traversal using link members
         if (root == NULL)
             return;
-        struct record *here = SPLAY_CONTAINER(root, struct record, link);
+        struct record *rec = SPLAY_CONTAINER(root, struct record, link);
     
         // Traverse left subtree
-        print_all_records(here->link.child[SPLAY_LEFT]);
+        print_all_records(rec->link.child[SPLAY_LEFT]);
 
         // Visit node
-        printf("%s: %d\n", here->key, here->val);
+        printf("%s: %d\n", rec->key, rec->val);
 
         // Traverse right subtree
-        print_all_records(here->link.child[SPLAY_RIGHT]);
+        print_all_records(rec->link.child[SPLAY_RIGHT]);
     }
 ```

@@ -1,34 +1,39 @@
-#include "src/splay.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include "src/splay.h"
 
 struct record {
 	int num;
 	struct splay_link link;
 };
 
-enum splay_dir record_nav(const struct splay_link *here, const struct splay_link *arg)
+enum splay_dir record_nav(const struct splay_link *arg, const struct splay_link *tree_node)
 {
-	struct record *a = SPLAY_CONTAINER(here, struct record, link);
-	struct record *b = SPLAY_CONTAINER(arg, struct record, link);
+	struct record *a = SPLAY_CONTAINER(arg, struct record, link);
+	struct record *b = SPLAY_CONTAINER(tree_node, struct record, link);
 
-	if (b->num < a->num)
+	if (a->num < b->num)
 		return SPLAY_LEFT;
-	else if (b->num > a->num)
+	else if (a->num > b->num)
 		return SPLAY_RIGHT;
 	return SPLAY_HERE;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 void save_records(struct splay_link *root, int *arr, size_t *len)
 {
+	if (!root)
+		return;
 	struct record *rec = SPLAY_CONTAINER(root, struct record, link);
 
-	if (rec->link.child[SPLAY_LEFT])
-		save_records(rec->link.child[SPLAY_LEFT], arr, len);
+	save_records(rec->link.child[SPLAY_LEFT], arr, len);
 	arr[(*len)++] = rec->num;
-	if (rec->link.child[SPLAY_RIGHT])
-		save_records(rec->link.child[SPLAY_RIGHT], arr, len);
+	save_records(rec->link.child[SPLAY_RIGHT], arr, len);
 }
 
 void splaysort(int *arr, size_t len)

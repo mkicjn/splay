@@ -34,13 +34,13 @@ struct splay_link *splay_find(struct splay_link **root_ptr, splay_nav_fn nav, co
 
 	for (;;) {
 		struct splay_link *g = *root_ptr;
-		enum splay_dir dir = nav(g, arg);
+		enum splay_dir dir = nav(arg, g);
 		if (dir == SPLAY_HERE)
 			break;
 
 		struct splay_link *p = g->child[dir];
 		// Special handling for zig-zig case
-		if (p != NULL && nav(p, arg) == dir) {
+		if (p != NULL && nav(arg, p) == dir) {
 			g = p;
 			rotate(root_ptr, dir);
 		}
@@ -60,7 +60,7 @@ struct splay_link *splay_find(struct splay_link **root_ptr, splay_nav_fn nav, co
 	g->child[SPLAY_LEFT] = subtree[SPLAY_LEFT];
 	g->child[SPLAY_RIGHT] = subtree[SPLAY_RIGHT];
 
-	if (nav(g, arg) == SPLAY_HERE)
+	if (nav(arg, g) == SPLAY_HERE)
 		return g;
 	else
 		return NULL;
@@ -80,7 +80,7 @@ struct splay_link *splay_insert(struct splay_link **root_ptr, splay_nav_fn nav, 
 		return collision;
 
 	struct splay_link *g = *root_ptr;
-	int dir = nav(g, arg);
+	int dir = nav(arg, g);
 	arg->child[1-dir] = g;
 	arg->child[dir] = g->child[dir];
 	g->child[dir] = NULL;
@@ -88,10 +88,10 @@ struct splay_link *splay_insert(struct splay_link **root_ptr, splay_nav_fn nav, 
 	return NULL;
 }
 
-static enum splay_dir splay_nav_to_min(const struct splay_link *n, const struct splay_link *unused)
+static enum splay_dir splay_nav_to_min(const struct splay_link *arg, const struct splay_link *tree_node)
 {
-	(void)unused;
-	if (n->child[SPLAY_LEFT] == NULL)
+	(void)arg;
+	if (tree_node->child[SPLAY_LEFT] == NULL)
 		return SPLAY_HERE;
 	else
 		return SPLAY_LEFT;

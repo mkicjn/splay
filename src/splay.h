@@ -4,9 +4,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+// **************** Intrusive splay link structure ****************
 
-// Intrusive splay link structure
-//
 // Usage example:
 // ...
 // struct my_record { // "User struct"
@@ -18,34 +17,35 @@
 // }
 // ...
 //
-// The link field need not be initialized by the user before insertion
+// When creating a user struct, the link member may be left uninitialized.
 
 struct splay_link {
 	struct splay_link *child[2];
 };
 
 
-// A navigation (nav) function must also be provided by the user to compare two user structs
-// Each user struct is referenced by a pointer to the link member inside it
+// A navigation (nav) function must also be provided by the user to compare two user structs.
+// Each user struct is referenced by a pointer to the link member inside it.
 //
-// Parameters:
-// - here: A node currently existing in the tree which forms the basis for the comparison
-// - arg: The splay_link pointer argument provided to the API function for comparison
+// Required parameters:
+// - arg: The splay_link pointer argument provided by the user to an API function for comparison
+// - tree_node: A node currently existing in the tree which forms the basis for the comparison
 //
-// Returns: enum splay_dir value described below
-// - SPLAY_HERE if arg and here are equivalent (i.e., arg == here)
-// - SPLAY_LEFT if the splaying algorithm should go LEFT from here (i.e., arg < here)
-// - SPLAY_RIGHT if the splaying algorithm should go RIGHT from here (i.e., arg > here)
+// Required return value: enum splay_dir value as follows:
+// - SPLAY_HERE  if arg matches tree_node (i.e., arg == tree_node)
+// - SPLAY_LEFT  if arg would go to the LEFT of tree_node  (i.e., arg < tree_node)
+// - SPLAY_RIGHT if arg would go to the RIGHT of tree_node (i.e., arg > tree_node)
 
 enum splay_dir {
-	// (never use for child indexing)
+	// (must not be used for child indexing)
 	SPLAY_HERE = -1,
-	// (OK to use for child indexing)
+	// (may be used for child indexing)
 	SPLAY_LEFT  = 0,
 	SPLAY_RIGHT = 1,
 };
 
-typedef enum splay_dir (*splay_nav_fn)(const struct splay_link *here, const struct splay_link *arg);
+typedef enum splay_dir (*splay_nav_fn)(const struct splay_link *arg, const struct splay_link *tree_node);
+
 
 // To retrieve a pointer to a user struct based on a pointer to its link member, invoke the below macro
 //
