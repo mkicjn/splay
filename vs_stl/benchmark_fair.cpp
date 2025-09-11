@@ -1,3 +1,9 @@
+// Application of same benchmarking procedure to std::map... at least, as accurately as reasonably possible
+//
+// Conceptually, the benchmark tests the use case of std::map<std::string, int>, but a simplistic translation puts C++ at a slight disadvantage
+// It is more of a norm in C to avoid memory allocations, but this style is unusual in C++, so it is replicated here only for fairness
+// For a more "idiomatic" translation, see benchmark_idiomatic.c
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -124,5 +130,7 @@ int main(int argc, char **argv)
 
 	delete[] rand_indices;
 	delete[] test_nodes;
+	if (map.size() > 0)
+		printf("Unexpected nodes remaining in splay tree\n");
 	return 0;
 }

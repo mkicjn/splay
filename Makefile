@@ -1,6 +1,6 @@
 CFLAGS=-O3 -Wall -Wextra -pedantic
 
-ALL=benchmark sorting_test
+ALL=benchmark benchmark_dynamic sorting_test
 
 all: $(ALL)
 

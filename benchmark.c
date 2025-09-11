@@ -137,5 +137,7 @@ int main(int argc, char **argv)
 
 	free(rand_indices);
 	free(test_nodes);
+	if (root != NULL)
+		printf("Unexpected nodes remaining in splay tree\n");
 	return 0;
 }

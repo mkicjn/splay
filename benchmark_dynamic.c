@@ -132,7 +132,7 @@ int main(int argc, char **argv)
 	printf("Average find time (random order): %fms\n", (find_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
 
 	// Shuffle the index array again
-	shuffle(rand_indices, num_tests);
+	shuffle(rand_indices, num_test_keys);
 
 	// Measure the time to delete each item in that order
 	clock_t delete_time = clock();
@@ -154,6 +154,8 @@ int main(int argc, char **argv)
 
 	free(rand_indices);
 	free(test_keys);
+	if (root != NULL)
+		printf("Unexpected nodes remaining in splay tree\n");
 	free_records(root);
 	return 0;
 }
