@@ -47,14 +47,14 @@ enum splay_dir {
 typedef enum splay_dir (*splay_nav_fn)(const struct splay_link *arg, const struct splay_link *tree_node);
 
 
-// To retrieve a pointer to a user struct based on a pointer to its link member, invoke the below macro
+// To retrieve a pointer to a user struct based on a pointer to its link member, invoke the below macro.
 //
 // Parameters:
-// - PTR: A pointer to the link member inside a user struct
-// - T: The type of the user struct (e.g., `struct my_record`)
-// - MEMB: The name of the link member within the user struct (e.g., `link`)
+// - PTR: A pointer to a member inside a struct
+// - T: The type of the struct (e.g., `struct my_record`)
+// - MEMB: The name of the member within that struct (e.g., `link`)
 //
-// Expands to: An expression that calculates a user struct pointer from a given link member pointer
+// Expands to an expression that calculates a user struct pointer from a given member pointer
 #define SPLAY_CONTAINER(PTR, T, MEMB) ((T *)((char *)(PTR) - ((size_t)(&((T *)0)->MEMB))))
 
 
