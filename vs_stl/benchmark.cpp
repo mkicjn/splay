@@ -1,31 +1,22 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "src/splay.h"
+#include <map>
 
 #define KEYLEN 32
 
-struct record {
+struct Record {
 	char key[KEYLEN];
 	int val;
-	struct splay_link link;
 };
 
-enum splay_dir record_nav(const struct splay_link *arg, const struct splay_link *tree_node)
+bool compare_records(char *const &a, char *const &b)
 {
-	struct record *a = SPLAY_CONTAINER(arg, struct record, link);
-	struct record *b = SPLAY_CONTAINER(tree_node, struct record, link);
-
-	int cmp = strcmp(a->key, b->key);
-	if (cmp < 0)
-		return SPLAY_LEFT;
-	else if (cmp > 0)
-		return SPLAY_RIGHT;
-	return SPLAY_HERE;
+	return strcmp(b, a) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,15 +49,13 @@ void shuffle(int *arr, size_t len)
 	}
 }
 
-void print_records(struct splay_link *root)
+void print_records(std::map<char *, Record *, decltype(&compare_records)> &map)
 {
-	if (!root)
-		return;
-	struct record *rec = SPLAY_CONTAINER(root, struct record, link);
-
-	print_records(rec->link.child[SPLAY_LEFT]);
-	printf("%s: %d\n", rec->key, rec->val);
-	print_records(rec->link.child[SPLAY_RIGHT]);
+	for (const auto &kvp : map) {
+		auto k = kvp.first;
+		auto v = kvp.second;
+		printf("%s: %d\n", k, v->val);
+	}
 }
 
 int main(int argc, char **argv)
@@ -77,35 +66,32 @@ int main(int argc, char **argv)
 	if (argc > 1)
 		sscanf(argv[1], "%lu", &num_tests);
 
-	struct record *test_nodes = malloc(num_tests * sizeof(*test_nodes));
+	Record *test_nodes = new Record[num_tests];
 	size_t next_rec = 0;
 
-	struct splay_link *root = NULL;
-
-	printf("Initializing node pool with random bytes...\n");
-	for (size_t i = 0; i < num_tests * sizeof(*test_nodes); i++)
-		((char *)test_nodes)[i] = rand() % 0xff;
+	std::map<char *, Record *, decltype(&compare_records)> map(&compare_records);
 
 	printf("Generating and inserting %lu random string/integer pairs\n", num_tests);
 
 	// Measure time to insert nodes
 	clock_t insert_time = clock();
 	for (size_t i = 0; i < num_tests; i++) {
-		struct record *rec = &test_nodes[next_rec++];
+		Record *rec = &test_nodes[next_rec++];
 		rand_string(rec->key);
 		rec->val = rand();
-		if (splay_insert(&root, record_nav, &rec->link) != NULL) {
+		if (map.count(rec->key)) {
 			printf("Insertion failed (duplicate)\n");
 			printf("Word was: %s\n", rec->key);
 		}
+		map[rec->key] = rec;
 	}
 	insert_time = clock() - insert_time;
 	if (argc > 2)
-		print_records(root);
+		print_records(map);
 	printf("Average generation + insertion time: %fms\n", (insert_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
 
 	// Generate a shuffled array of indices for testing randomized lookup time
-	int *rand_indices = malloc(num_tests * sizeof(*rand_indices));
+	int *rand_indices = new int[num_tests];
 	for (size_t i = 0; i < num_tests; i++)
 		rand_indices[i] = i;
 	shuffle(rand_indices, num_tests);
@@ -113,8 +99,9 @@ int main(int argc, char **argv)
 	// Measure the time to do lookups in that randomized order
 	clock_t find_time = clock();
 	for (size_t i = 0; i < num_tests; i++) {
-		struct record *rec = &test_nodes[rand_indices[i]];
-		if (!splay_find(&root, record_nav, &rec->link))
+		Record *rec = &test_nodes[rand_indices[i]];
+		auto match = map.find(rec->key);
+		if (match == map.end())
 			printf("Find failed\n");
 	}
 	find_time = clock() - find_time;
@@ -126,16 +113,16 @@ int main(int argc, char **argv)
 	// Measure the time to delete each item in that order
 	clock_t delete_time = clock();
 	for (size_t i = 0; i < num_tests; i++) {
-		struct record *rec = &test_nodes[rand_indices[i]];
-		if (!splay_delete(&root, record_nav, &rec->link)) {
-			printf("Deletion failed\n");
-			printf("Word was: %s\n", rec->key);
-		}
+		Record *rec = &test_nodes[rand_indices[i]];
+		auto match = map.find(rec->key);
+		if (match == map.end())
+			printf("Find failed\n");
+		map.erase(match);
 	}
 	delete_time = clock() - delete_time;
 	printf("Average delete time (random order): %fms\n", (delete_time / (double)CLOCKS_PER_SEC * 1000.0) / num_tests);
 
-	free(rand_indices);
-	free(test_nodes);
+	delete[] rand_indices;
+	delete[] test_nodes;
 	return 0;
 }

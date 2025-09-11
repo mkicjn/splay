@@ -50,7 +50,7 @@ A previous version of the API had `const void *` arguments instead to foreshadow
         struct record *rec1 = SPLAY_CONTAINER(here, struct record, link);
         struct record *rec2 = SPLAY_CONTAINER(arg, struct record, link);
     
-        int cmp = strcmp(rec2->key, rec1->key);
+        int cmp = strcmp(rec1->key, rec2->key);
         if (cmp < 0)
             return SPLAY_LEFT; // arg < here, go left
         else if (cmp > 0)
