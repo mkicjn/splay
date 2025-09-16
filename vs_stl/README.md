@@ -12,20 +12,22 @@ Therefore, two implementations test this idea:
 
 ## Results
 
-On author's machine, each benchmark's performance is *roughly* comparable, but in relative terms place as follows:
+On author's machine, each benchmark's average lookup performance is *roughly* comparable, but in relative terms place as follows:
 
 1. `./benchmark_idiomatic` (fastest, surprisingly)
-2. `./benchmark_fair` (marginally worse)
-3. `../benchmark` (marginally worse still)
-4. `../benchmark_dynamic` (quite a bit worse somehow)
+2. `./benchmark_fair` (marginally worse, +0.04us)
+3. `../benchmark` (marginally worse still, +0.02us)
+4. `../benchmark_dynamic` (quite a bit worse somehow, +0.1us)
+
+These rankings seem to vary machine-to-machine, and splay trees have unique tradeoffs that aren't demonstrated at all here, so it's all apples-to-oranges anyway.
+It's also interesting to measure the total runtime of the different benchmarks, which results in a completely different ranking somehow as well.
 
 Despite being marginally outperformed, this homegrown splay tree implementation punches way above its weight class, weighing in at ~120 LOC top to bottom.
 Meanwhile, GCC's `libstdc++-v3/include/bits/stl_map.h` (which seems to drive `std::map`) weighs in at ~14x the size.
+This testing was done under essentially the worst realistic conditions for the splay tree, too: re-accessing all of the nodes in a random order with no chance of repetition.
 
-Actual measurements were omitted above, but because splay trees have unique advantages and disadvantages that aren't being demonstrated here at all, it's apples-to-oranges anyway.
-
-Namely, splay trees should perform much better with non-uniformly random access patterns (even completely sequential ones), which again, aren't (yet) being tested at all.
-Meanwhile, `std::map` would be expected to exhibit roughly the same performance per access, regardless of whether accesses are uniform or not.
+Theoretically, splay trees should exhibit significantly better amortized performance than std::map on non-uniformly random or non-random accesses, which again, aren't being tested at all yet.
+Meanwhile, `std::map` would be expected to exhibit roughly the same amortized performance per access, regardless of any circumstances.
 
 On the other hand, splay trees also have the unique disadvantage of being modified on reads as well as writes.
 This is somewhat meaningless for single-threaded applications, but more-or-less makes them unusable in any parallelizable way.
