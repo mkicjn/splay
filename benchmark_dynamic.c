@@ -75,9 +75,9 @@ void free_records(struct splay_link *root)
 		return;
 	struct record *rec = SPLAY_CONTAINER(root, struct record, link);
 
-	print_records(rec->link.child[SPLAY_LEFT]);
+	free_records(rec->link.child[SPLAY_LEFT]);
+	free_records(rec->link.child[SPLAY_RIGHT]);
 	free(rec);
-	print_records(rec->link.child[SPLAY_RIGHT]);
 }
 
 int main(int argc, char **argv)
